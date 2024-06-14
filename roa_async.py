@@ -2,7 +2,9 @@
 import asyncio
 import json
 import os
+
 import aiohttp
+
 from count_connections import count_max_connections
 
 
@@ -69,39 +71,45 @@ def start_session(file, key = 'result'):
         print(f"Found {len(completed)} completed cases")
     return completed
 
+def main(sessionID, nconcurrent, years):
+    
+    completed = start_session('courtROA.json', 'caseNumber')
+    
+    cases = []
+    for year in years:
+        cases += open_cases(f'courtDocket{year}.json', completed, prefix = str(year))
+        
+    results = asyncio.run(get_cases(cases[0:nconcurrent], sessionID, nconcurrent))
+    results = [r for r in results if r is not None]
+    print(len(results))
+    if results:
+        with open('courtROA.json', 'a') as f:
+            json.dump(results, f)
+
+    with open('courtROA.json', 'r') as f:
+        data = f.read()
+        data = data.replace('][','').replace('}{', '},{').replace('}\n{', '},{')
+        data = json.loads(data)
+        print(len(data))
+    with open('courtROA.json', 'w') as f:
+        json.dump(data, f)
 
 
 
 
-count_max_connections(os = 'Linux')
-#1048576
+
+
+sessionID = 'F7F43E0EC37ACB0F78FAF525CDBAB3E0C5A4C2EE'
+nconcurrent = 360
+main(sessionID, nconcurrent, [2023, 2022, 2021, 2020, 2019, 2018])
 
 
 
 
-sessionID = 'F5963F89F965B8FA1B223A6E42FD963D989D3003'
-nconcurrent = 400
-completed = start_session('courtROA.json', 'caseNumber')
-cases = open_cases('courtDocket.json', completed, prefix = '24')
-
-results = asyncio.run(get_cases(cases[0:nconcurrent], sessionID, nconcurrent))
-results = [r for r in results if r is not None]
-if results:
-    with open('courtROA.json', 'a') as f:
-        json.dump(results, f)
-
-
-with open('courtROA.json', 'r') as f:
-    data = f.read()
-    data = data.replace('][','').replace('}{', '},{').replace('}\n{', '},{')
-    data = json.loads(data)
-    print(len(data))
-with open('courtROA.json', 'w') as f:
-    json.dump(data, f)
     
     
-    
-    
+"""
+# Run in loop
     for i, batch in enumerate([cases[i:i+nconcurrent] for i in range(0, len(cases), nconcurrent)]):
         print(i)
         results = asyncio.run(get_cases(cases[0:nconcurrent], sessionID, nconcurrent))
@@ -112,7 +120,7 @@ with open('courtROA.json', 'w') as f:
         else:
             print('Session expired')
             break
-        
+"""
 
 
 
