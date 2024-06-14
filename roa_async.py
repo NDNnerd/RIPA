@@ -71,17 +71,27 @@ def start_session(file, key = 'result'):
         print(f"Found {len(completed)} completed cases")
     return completed
 
+
+
+
+
+count_max_connections(os = 'Linux')
+#1048576
+
+
 def main(sessionID, nconcurrent, years):
     
     completed = start_session('courtROA.json', 'caseNumber')
     
     cases = []
     for year in years:
-        cases += open_cases(f'courtDocket{year}.json', completed, prefix = str(year))
-        
+        cases += open_cases(f'courtDocket.json', completed, prefix = str(year))
+    print(f"Found {len(cases)} cases")
+    
     results = asyncio.run(get_cases(cases[0:nconcurrent], sessionID, nconcurrent))
     results = [r for r in results if r is not None]
-    print(len(results))
+
+    print(f"Returned len(results) cases")
     if results:
         with open('courtROA.json', 'a') as f:
             json.dump(results, f)
@@ -90,7 +100,7 @@ def main(sessionID, nconcurrent, years):
         data = f.read()
         data = data.replace('][','').replace('}{', '},{').replace('}\n{', '},{')
         data = json.loads(data)
-        print(len(data))
+        print(f"Total cases: {len(data)}")
     with open('courtROA.json', 'w') as f:
         json.dump(data, f)
 
@@ -99,17 +109,17 @@ def main(sessionID, nconcurrent, years):
 
 
 
-sessionID = 'F7F43E0EC37ACB0F78FAF525CDBAB3E0C5A4C2EE'
+sessionID = 'EC49B2FA15F45F22C9778317854F7C0D0EB984DE'
 nconcurrent = 360
-main(sessionID, nconcurrent, [2023, 2022, 2021, 2020, 2019, 2018])
+years = [23, 22, 21, 20, 19, 18]
 
 
 
 
-    
-    
+main('EC49B2FA15F45F22C9778317854F7C0D0EB984DE', 360, [23, 22, 21, 20, 19, 18])
+
 """
-# Run in loop
+# Run in batches
     for i, batch in enumerate([cases[i:i+nconcurrent] for i in range(0, len(cases), nconcurrent)]):
         print(i)
         results = asyncio.run(get_cases(cases[0:nconcurrent], sessionID, nconcurrent))
@@ -121,6 +131,3 @@ main(sessionID, nconcurrent, [2023, 2022, 2021, 2020, 2019, 2018])
             print('Session expired')
             break
 """
-
-
-
