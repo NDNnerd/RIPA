@@ -72,13 +72,6 @@ def start_session(file, key = 'result'):
     return completed
 
 
-
-
-
-count_max_connections(os = 'Linux')
-#1048576
-
-
 def main(sessionID, nconcurrent, years):
     
     completed = start_session('courtROA.json', 'caseNumber')
@@ -109,14 +102,14 @@ def main(sessionID, nconcurrent, years):
 
 
 
-sessionID = '1DC15F447A0128C7D884D949A88636F6F2CCD2EE'
+sessionID = '24D4702171A3FAA75D8F7AA250351D686286DEA8'
 nconcurrent = 360
-years = [23, 22, 21, 20, 19, 18]
+years = [22, 21, 20, 19, 18]
 
 
 
 
-main('87F96BC58D05C7C16ECF93D86525B4D9A1C237EE', 360, [23, 22, 21, 20, 19, 18])
+main('D408B66B3745377D074850EE4620E22991EEFC23', 360, [23, 22, 21, 20, 19, 18])
 
 """
 # Run in batches
