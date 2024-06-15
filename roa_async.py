@@ -91,7 +91,7 @@ def main(sessionID, nconcurrent, years):
     results = asyncio.run(get_cases(cases[0:nconcurrent], sessionID, nconcurrent))
     results = [r for r in results if r is not None]
 
-    print(f"Returned len(results) cases")
+    print(f"Returned {len(results)} cases")
     if results:
         with open('courtROA.json', 'a') as f:
             json.dump(results, f)
@@ -109,14 +109,14 @@ def main(sessionID, nconcurrent, years):
 
 
 
-sessionID = 'EC49B2FA15F45F22C9778317854F7C0D0EB984DE'
+sessionID = '1DC15F447A0128C7D884D949A88636F6F2CCD2EE'
 nconcurrent = 360
 years = [23, 22, 21, 20, 19, 18]
 
 
 
 
-main('EC49B2FA15F45F22C9778317854F7C0D0EB984DE', 360, [23, 22, 21, 20, 19, 18])
+main('87F96BC58D05C7C16ECF93D86525B4D9A1C237EE', 360, [23, 22, 21, 20, 19, 18])
 
 """
 # Run in batches
