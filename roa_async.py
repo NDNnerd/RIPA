@@ -24,7 +24,7 @@ def get_headers(sessionID):
     }
 
 
-def open_cases(file, completed = [], prefix = ''):
+def open_cases(file = 'courtDocket.json', completed = [], prefix = ''):
     with open(file, 'r') as f:
         register = json.load(f)
     relevant = []
@@ -46,13 +46,14 @@ async def get_case(case, sessionID, nconcurrent = 10):
     semaphore = asyncio.Semaphore(nconcurrent)
     async with semaphore:  # Acquire semaphore before making the request
         async with aiohttp.ClientSession() as session:
-            async with session.get(f'https://webapps.sftc.org/crimportal/crimportal.dll/datasnap/rest/TServerMethods1/GetROA/{case}/{sessionID}', headers=headers) as response:
+            async with session.get(f'https://webapps.sftc.org/crimportal/crimportal.dll/datasnap/rest/TServerMethods1/GetAttorneys/{case}/{sessionID}', headers=headers) as response:
+                # Return to ROA with GetROA
                 if response.status == 200:
                     data = await response.json()
                     if data['result'][0] == -1:
                         return None
                     else:
-                        return {"caseNumber": case, "roa_entries": data['result'][0], "roa": data['result'][1]}
+                        return {"caseNumber": case, "attorney_results": data['result'][0], "attorneys": data['result'][1]}
                 else:
                     return None
 
@@ -74,7 +75,7 @@ def start_session(file, key = 'result'):
 
 def main(sessionID, nconcurrent, years):
     
-    completed = start_session('courtROA.json', 'caseNumber')
+    completed = start_session('courtAttorneys.json', 'caseNumber')
     
     cases = []
     for year in years:
@@ -86,15 +87,15 @@ def main(sessionID, nconcurrent, years):
 
     print(f"Returned {len(results)} cases")
     if results:
-        with open('courtROA.json', 'a') as f:
+        with open('courtAttorneys.json', 'a') as f:
             json.dump(results, f)
 
-    with open('courtROA.json', 'r') as f:
+    with open('courtAttorneys.json', 'r') as f:
         data = f.read()
         data = data.replace('][','').replace('}{', '},{').replace('}\n{', '},{')
         data = json.loads(data)
         print(f"Total cases: {len(data)}")
-    with open('courtROA.json', 'w') as f:
+    with open('courtAttorneys.json', 'w') as f:
         json.dump(data, f)
 
 
@@ -102,11 +103,11 @@ def main(sessionID, nconcurrent, years):
 
 
 
-sessionID = '24D4702171A3FAA75D8F7AA250351D686286DEA8'
+sessionID = '2909A2AD8E326BCAC48E38B24C1A225B9D8813C5'
 nconcurrent = 360
-years = [22, 21, 20, 19, 18]
+years = [24, 23, 22, 21, 20, 19, 18]
 
-main('CA31E2FA873A22C1DD52891B93CACA56CE900B0B', 360, [19, 18, 17, 16, 15, 14, 13])
+main('CAC2CF1B5330BC358C0955250602171D7807D3D5', 250, [24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13])
 
 """
 # Run in batches
